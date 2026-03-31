@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Portal do Professor</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f8;
+    }
+
+    header {
+      background: #007BFF;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    nav {
+      background: #0056b3;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      margin: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .stars span {
+      font-size: 22px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>👨‍🏫 Portal do Professor</h1>
+  <p>Gerencie aulas e receba avaliações</p>
+</header>
+
+<nav>
+  <a href="index.html">Início</a>
+  <a href="sistemas-operacionais.html">Conteúdo</a>
+</nav>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Adicionar Disciplina</h2>
+    <input type="text" id="disciplinaInput" placeholder="Nome da disciplina">
+    <button onclick="adicionarDisciplina()">Adicionar</button>
+  </div>
+
+  <div id="disciplinas"></div>
+
+</div>
+
+<script>
+let disciplinas = JSON.parse(localStorage.getItem("disciplinas")) || [];
+
+function salvar() {
+  localStorage.setItem("disciplinas", JSON.stringify(disciplinas));
+}
+
+function adicionarDisciplina() {
+  let nome = document.getElementById("disciplinaInput").value;
+  if (!nome) return;
+
+  disciplinas.push({ nome, votos: [] });
+  document.getElementById("disciplinaInput").value = "";
+  salvar();
+  render();
+}
+
+function votar(index, nota) {
+  disciplinas[index].votos.push(nota);
+  salvar();
+  render();
+}
+
+function media(votos) {
+  if (votos.length === 0) return "Sem avaliação";
+  return (votos.reduce((a,b)=>a+b,0)/votos.length).toFixed(1);
+}
+
+function render() {
+  let div = document.getElementById("disciplinas");
+  div.innerHTML = "";
+
+  disciplinas.forEach((d, i) => {
+    div.innerHTML += `
+      <div class="card">
+        <h3>${d.nome}</h3>
+
+        <div class="stars">
+          Avaliar:
+          ${[1,2,3,4,5].map(n => `<span onclick="votar(${i},${n})">⭐</span>`).join("")}
+        </div>
+
+        <p><strong>Média:</strong> ${media(d.votos)}</p>
+      </div>
+    `;
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
